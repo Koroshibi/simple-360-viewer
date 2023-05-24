@@ -1,5 +1,7 @@
 # simple-360-viewer
 
-npm run build
+- npm i 
 
-Enjoy
+- npm run build
+
+- enjoy
