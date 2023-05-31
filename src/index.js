@@ -25,24 +25,24 @@ controls.enablePan = false;
 camera.position.set(-0.1, 0, 0);
 controls.update();
 
-function render() {
-  requestAnimationFrame(render);
+dropzone.addEventListener("dragover", handleDragOver, false);
 
-  controls.update();
+dropzone.addEventListener("dragleave", handleDragLeave, false);
 
-  renderer.render(scene, camera);
-}
+dropzone.addEventListener("drop", handleDrop, false);
 
-dropzone.addEventListener("dragover", (e) => {
+window.onresize = handleResize;
+
+function handleDragOver(e) {
   e.preventDefault();
   dropzone.style.border = "2px dashed #4d4d4d";
-});
+}
 
-dropzone.addEventListener("dragleave", () => {
+function handleDragLeave() {
   dropzone.style.border = "2px dashed #ccc";
-});
+}
 
-dropzone.addEventListener("drop", (e) => {
+function handleDrop(e) {
   e.preventDefault();
 
   dropzone.style.display = "none";
@@ -52,23 +52,35 @@ dropzone.addEventListener("drop", (e) => {
   var reader = new FileReader();
   reader.readAsDataURL(file);
 
-  reader.onload = function (event) {
-    const geometry = new THREE.SphereGeometry(50, 32, 32);
-    const texture = new THREE.TextureLoader().load(event.target.result);
-    const material = new THREE.MeshBasicMaterial({
-      map: texture,
-      side: THREE.DoubleSide,
-    });
+  reader.onload = handleReaderOnLoad;
+}
 
-    material.transparent = true;
+function handleReaderOnLoad(event) {
+  const geometry = new THREE.SphereGeometry(50, 32, 32);
+  const texture = new THREE.TextureLoader().load(event.target.result);
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    side: THREE.DoubleSide,
+  });
 
-    const sphere = new THREE.Mesh(geometry, material);
-    scene.add(sphere);
+  material.transparent = true;
 
-    render();
-  };
-});
+  const sphere = new THREE.Mesh(geometry, material);
+  scene.add(sphere);
 
-window.onresize = function () {
+  render();
+}
+
+function render() {
+  requestAnimationFrame(render);
+
+  controls.update();
+
+  renderer.render(scene, camera);
+}
+
+function handleResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-};
+}
